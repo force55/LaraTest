@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Post;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CatalogController extends Controller
 {
@@ -14,9 +16,9 @@ class CatalogController extends Controller
      */
     public function index()
     {
-        $posts = Post::get();
+        $posts = Post::paginate(1);
 
-        return view('catalog',compact('posts'));
+        return view('catalog', compact('posts'));
     }
 
     /**
@@ -26,18 +28,42 @@ class CatalogController extends Controller
      */
     public function create()
     {
-        //
+        return view('posts.create');
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
         //
+        $name = $request->name;
+        $description = $request->description;
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'description' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect('posts/create')
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $post = new Post;
+
+        $post->name = $name;
+        $post->description = $description;
+
+        $post->save();
+
+        $this->flashMessage($request, 'Post was created', 'success');
+
+
+        return redirect()->route('catalog');
     }
 
     /**
@@ -50,30 +76,51 @@ class CatalogController extends Controller
     {
         $post = Post::findOrFail($id);
 
-        return view('posts.show',compact('post'));
+        return view('posts.show', compact('post'));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Post  $post
+     * @param \App\Post $post
      * @return \Illuminate\Http\Response
      */
-    public function edit(Post $post)
+    public function edit($id, Post $post)
     {
-        //
+        $post = Post::findOrFail($id);
+
+        return view('posts.edit', compact('post'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Post  $post
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Post $post)
+    public function update($id, Request $request)
     {
         //
+        $post = Post::find($id);
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'description' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect('posts/edit/' . $id)
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $post->name = $request->name;
+        $post->description = $request->description;
+
+        $post->save();
+
+        $this->flashMessage($request, 'Post was updated', 'success');
+
+        return redirect()->route('catalog');
     }
 
     /**
@@ -81,12 +128,15 @@ class CatalogController extends Controller
      *
      * @param $id
      * @param \App\Post $post
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id,Post $post)
+    public function destroy($id, Post $post, Request $request)
     {
         //
         Post::find($id)->delete();
+
+        $this->flashMessage($request, 'Post was deleted', 'success');
 
         return redirect()->route('catalog');
     }

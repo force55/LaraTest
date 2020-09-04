@@ -10,5 +10,7 @@
             @endif
         </div>
     @endforeach
+
+    {{ $posts->links() }}
 @endsection
 

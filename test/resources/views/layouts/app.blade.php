@@ -64,6 +64,22 @@
     </style>
 </head>
 <body>
+<header>
+    <nav>
+        <ul>
+            <li>
+                <a href="{{ route('post.create') }}">Create</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+@if(Session::has('message'))
+    <div class="mb-5">
+        <div class="alert alert-{{ Session::get('message-type', 'info') }}">
+            {{ Session::get('message') }}
+        </div>
+    </div>
+@endif
 <div class="flex-center position-ref full-height">
     <div class="content">
         @yield('content')

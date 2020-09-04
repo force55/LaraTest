@@ -8,7 +8,7 @@ class Post extends Model
 {
     //
 
-    protected $fillable = ['name', 'description'];
+    protected $fillable = ['name'=>'test', 'description'=>'temp'];
     /**
      * The attributes that should be cast to native types.
      *
@@ -18,4 +18,5 @@ class Post extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
 }
