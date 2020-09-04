@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('content')
-    <h1>Каталог</h1>
+    <h1 class="main-text">Каталог</h1>
     @foreach($posts as $post)
         <div class="post">
             <a href="post/{{$post->id}}"> {{ $post->name }}</a>
